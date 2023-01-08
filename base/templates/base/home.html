@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Home page</h1>
+<h2>Violating pilots</h2>
+
+<div>
+    <div>
+        {% for pilot in violating_pilots %}
+            <div>
+                <h5>{{pilot.name}} flew within {{pilot.closest_distance}} of the bird nest. Contact at {{pilot.email}} or {{pilot.phone}}</h5>
+            </div>
+
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

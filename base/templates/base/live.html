@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Live page</h1>
+
+<h2 id="app"> {{ text }} </h2>
+
+<script>
+    var socket = new WebSocket('ws://localhost:8000/ws/live/');
+
+    socket.onmessage = function(event) {
+        var data = JSON.parse(event.data);
+        console.log(data);
+        console.table(data);
+        document.querySelector('#app').innerText = data;
+    }
+
+</script>
+
+
+{% endblock %}
