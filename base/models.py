@@ -1,12 +1,11 @@
 from django.db import models
-from . import functions
 
 # Create your models here.
 
 class Drone(models.Model):
-    serial_number = models.CharField(max_length=20, primary_key=True)
+    serial_number = models.CharField(max_length=20, unique = True)
     closest_approach = models.FloatField(max_length=20)
-    last_seen = models.DateTimeField(auto_now=True)
+    last_seen = models.CharField(max_length=20)
 
     def __str__(self):
         return self.serial_number

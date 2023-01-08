@@ -7,13 +7,14 @@
 
 <div>
     <div>
-        {% for pilot in violating_pilots %}
+        {% for drone in drones %}
             <div>
-                <h5>{{pilot.name}} flew within {{pilot.closest_distance}} of the bird nest. Contact at {{pilot.email}} or {{pilot.phone}}</h5>
+                <h5>Serial: {{drone.serial_number}}. Closest approach: {{drone.closest_approach}}. Last seen: {{drone.last_seen}}</h5>
             </div>
 
         {% endfor %}
     </div>
 </div>
+
 
 {% endblock %}
