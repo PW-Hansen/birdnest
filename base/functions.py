@@ -1,9 +1,11 @@
 import math
 import xml.etree.ElementTree as ET
 import requests
+import json
 from datetime import datetime
+from django.utils import dateparse
 
-from .models import Drone
+from .models import Drone, Pilot
 
 
 # calc_distance constants
@@ -13,9 +15,16 @@ NEST_X, NEST_Y = 250.0, 250.0
 GUARDB1RD_URL = 'https://assignments.reaktor.com/birdnest/drones'
 INFORMATION = ['serialNumber', 'positionX', 'positionY']
 
+# query_pilot constants
+PILOT_URL = 'https://assignments.reaktor.com/birdnest/pilots/'
+
 # update_drones constants
-PERSIST_TIME = 1 # Minutes
+PERSIST_TIME = 60 * 2 # Seconds
 NDZ_PERIMETER = 100 # Meters
+
+# generate_violating_pilots_string constants
+BASE_STRING = '''{PILOT_NAME} flew within {DRONE_DISTANCE} of the bird nest using the drone {DRONE_DB}, last seen {DRONE_TIME}. Contact them at {PILOT_PHONE} or {PILOT_EMAIL}.  
+'''
 
 def calc_distance(pos_x, pos_y):
     '''
@@ -40,7 +49,8 @@ def read_guardb1rd_xml():
     tree = ET.ElementTree(ET.fromstring(guardb1rd_xml))
     root = tree.getroot()
 
-    time = root.find('capture').attrib['snapshotTimestamp'][:-5] # The milliseconds are superflous.
+    timestamp = root.find('capture').attrib['snapshotTimestamp'] # The milliseconds are superflous.
+    time = dateparse.parse_datetime(timestamp)
 
     drone_list = []
 
@@ -63,11 +73,23 @@ def read_guardb1rd_xml():
         
     return time, drone_list
 
+def query_pilot(drone_db):
+    pilot_url = PILOT_URL + drone_db.serial_number
+ 
+    r = requests.get(pilot_url)
+    pilot_string = r.content.decode('utf-8')
+    pilot_JSON = json.loads(pilot_string)
+
+    name = f"{pilot_JSON['firstName']} {pilot_JSON['lastName']}"
+    phone = pilot_JSON['phoneNumber']
+    email = pilot_JSON['email']
+
+    pilot = Pilot(drone = drone_db, name = name, email = email, phone = phone)
+    pilot.save()
+
+
 def update_drones():
     time, drone_list = read_guardb1rd_xml()
-
-    time = time[11:]
-    dt_time = datetime.strptime(time, "%H:%M:%S")
 
     for drone in drone_list:
         serial_number, distance = drone['serialNumber'], drone['distance']
@@ -80,26 +102,50 @@ def update_drones():
 
             drone_db.last_seen = time
 
-        # Otherwise, add the drone to the database.
-        else:
+            drone_db.save()
+
+
+        # If the drone isn't in the database and is too close to the birdnest, add the drone to the database.
+        elif distance < NDZ_PERIMETER:
             drone_db = Drone(serial_number = serial_number, closest_approach = distance, last_seen = time)
 
-        drone_db.save()
+            drone_db.save()
+            query_pilot(drone_db)
+
 
     for db_drone in Drone.objects.all():
-        # Delete drones from database if they're not currently seen and if they haven't violated the NDZ.
+        last_seen_delta = (time - db_drone.last_seen).total_seconds()
+
+        # Delete drones from database if they're not currently seen and haven't violated the NDZ.
         if db_drone.last_seen != time:
             if db_drone.closest_approach > NDZ_PERIMETER:
                 db_drone.delete()
-            # Otherwise, the drone's information will persist for a number of minutes equal to the persist time constant.
+            # Otherwise, the drone's information will persist for a number of seconds equal to the persist time constant.
             else:
-                dt_last_seen = datetime.strptime(db_drone.last_seen, "%H:%M:%S")
-
-                delta = dt_time - dt_last_seen
-                time_delta = delta.total_seconds() / 60 # Minutes
-
-                if time_delta > PERSIST_TIME:
+                if last_seen_delta > PERSIST_TIME:
                     db_drone.delete()
 
+def generate_violating_pilots_string():
+    update_drones()
+
+    violating_pilots_string = ''
+
+    for pilot in Pilot.objects.all():
+        drone = pilot.drone
+
+        time = f'{drone.last_seen:%H:%M:%S}'
+
+        pilot_string = BASE_STRING.format(
+            PILOT_NAME = pilot.name,
+            PILOT_PHONE = pilot.phone,
+            PILOT_EMAIL = pilot.email,
+            DRONE_DISTANCE = drone.closest_approach,
+            DRONE_DB = drone.serial_number,
+            DRONE_TIME = time
+        )
+
+        violating_pilots_string += pilot_string
+    
+    return violating_pilots_string
 
 

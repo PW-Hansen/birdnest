@@ -5,7 +5,10 @@ from django.db import models
 class Drone(models.Model):
     serial_number = models.CharField(max_length=20, unique = True)
     closest_approach = models.FloatField(max_length=20)
-    last_seen = models.CharField(max_length=20)
+    last_seen = models.DateTimeField()
+
+    class Meta:
+        ordering = ['last_seen']
 
     def __str__(self):
         return self.serial_number

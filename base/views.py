@@ -1,16 +1,17 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import Drone
-from .functions import update_drones
+from .models import Drone, Pilot
+from .functions import generate_violating_pilots_string
 
 # Create your views here.
 
 def home(request):
-    update_drones()
+    pilot_string = generate_violating_pilots_string()
     drones = Drone.objects.all()
-    context = {'drones': drones}
+    pilots = Pilot.objects.all()
+    context = {'drones': drones, 'pilots': pilots, 'pilot_string': pilot_string}
     return render(request, 'base/home.html', context)
 
 def live(request):
-    context = {'text': 'This is a test'}
+    context = {}
     return render(request, 'base/live.html', context)

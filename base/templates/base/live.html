@@ -2,9 +2,9 @@
 
 {% block content %}
 
-<h1>Live page</h1>
+<h1>Wall of Shame</h1>
 
-<h2 id="app"> {{ text }} </h2>
+<p id="app"> {{ text }} </p>
 
 <script>
     var socket = new WebSocket('ws://localhost:8000/ws/live/');
@@ -13,7 +13,7 @@
         var data = JSON.parse(event.data);
         console.log(data);
         console.table(data);
-        document.querySelector('#app').innerText = data;
+        document.querySelector('#app').innerText = data['message'];
     }
 
 </script>

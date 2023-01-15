@@ -131,4 +131,4 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Datetime format.
-DATETIME_FORMAT = '%H:%m:%s'
+DATETIME_FORMAT = '%H:%M:%S'
