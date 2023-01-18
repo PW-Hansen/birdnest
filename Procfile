@@ -1,1 +1,1 @@
-web: gunicorn birdnest.asgi
+web: gunicorn birdnest.wsgi
