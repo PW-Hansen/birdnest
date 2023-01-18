@@ -24,17 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '_b@gvpz-ve+lzds0q9%t4$^*zi=n0lcg#e(%#a=z6%a7u0-t$#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['https://peterguardb1rd.herokuapp.com/', 'peterguardb1rd.herokuapp.com']
+ALLOWED_HOSTS = ['https://peterguardb1rd.herokuapp.com/', '127.0.0.1']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'channels',
-    'daphne',
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
