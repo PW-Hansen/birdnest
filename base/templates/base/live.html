@@ -7,7 +7,7 @@
 <p id="app"> {{ text }} </p>
 
 <script>
-    var socket = new WebSocket('ws://peterguardb1rd.herokuapp.com/live/');
+    var socket = new WebSocket('wss://peterguardb1rd.herokuapp.com/live/');
 
     socket.onmessage = function(event) {
         var data = JSON.parse(event.data);
