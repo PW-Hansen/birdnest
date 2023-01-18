@@ -19,7 +19,7 @@ INFORMATION = ['serialNumber', 'positionX', 'positionY']
 PILOT_URL = 'https://assignments.reaktor.com/birdnest/pilots/'
 
 # update_drones constants
-PERSIST_TIME = 60 * 2 # Seconds
+PERSIST_TIME = 60 * 10 # Seconds
 NDZ_PERIMETER = 100 # Meters
 
 # generate_violating_pilots_string constants
