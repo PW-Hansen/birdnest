@@ -23,8 +23,7 @@ PERSIST_TIME = 60 * 10 # Seconds
 NDZ_PERIMETER = 100 # Meters
 
 # generate_violating_pilots_string constants
-BASE_STRING = '''{PILOT_NAME} flew within {DRONE_DISTANCE} of the bird nest using the drone {DRONE_DB}, last seen {DRONE_TIME}. Contact them at {PILOT_PHONE} or {PILOT_EMAIL}.  
-'''
+BASE_STRING = '<li>{PILOT_NAME} flew within {DRONE_DISTANCE} m of the bird nest using the drone {DRONE_DB}, last seen {DRONE_TIME}. Contact them at {PILOT_PHONE} or {PILOT_EMAIL}.</li>'
 
 def calc_distance(pos_x, pos_y):
     '''
@@ -128,7 +127,7 @@ def update_drones():
 def generate_violating_pilots_string():
     update_drones()
 
-    violating_pilots_string = ''
+    violating_pilots_string = '<ul>'
 
     for pilot in Pilot.objects.all():
         drone = pilot.drone
@@ -145,6 +144,8 @@ def generate_violating_pilots_string():
         )
 
         violating_pilots_string += pilot_string
+    
+    violating_pilots_string += '</ul>'
     
     return violating_pilots_string
 

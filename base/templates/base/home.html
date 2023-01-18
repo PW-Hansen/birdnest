@@ -2,23 +2,16 @@
 
 {% block content %}
 
-<h1>Home page</h1>
-<h2>Violating pilots</h2>
+<script>
+    window.setTimeout(function () {
+    location.href = "http://127.0.0.1:8000/";
+    }, 1000);
 
-{{pilot_string}}
+</script>
 
-<h2>Drones</h2>
 
-<div>
-    <div>
-        {% for drone in drones %}
-            <div>
-                <h5>Serial: {{drone.serial_number}}. Closest approach: {{drone.closest_approach}}. Last seen: {{drone.last_seen}}</h5>
-            </div>
+<h1>Wall of Shame</h1>
 
-        {% endfor %}
-    </div>
-</div>
-
+{{pilot_string | safe }}
 
 {% endblock %}
