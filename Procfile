@@ -1,1 +1,1 @@
-web: daphne birdnest.asgi
+web: gunicorn birdnest.asgi
