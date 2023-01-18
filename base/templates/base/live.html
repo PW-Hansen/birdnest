@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Wall of Shame</h1>
+
+<p id="app"> {{ text }} </p>
+
+<script>
+    var socket = new WebSocket('wss://peterguardb1rd.herokuapp.com/live/');
+
+    socket.onmessage = function(event) {
+        var data = JSON.parse(event.data);
+        console.log(data);
+        console.table(data);
+        document.querySelector('#app').innerText = data['message'];
+    }
+
+</script>
+
+
+{% endblock %}
